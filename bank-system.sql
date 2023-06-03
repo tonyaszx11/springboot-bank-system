@@ -5,26 +5,26 @@ create table user(
 	user_login_name  varchar(10) unique not null, -- 登入名
 	user_password   char(64) not null,
 	user_name varchar(10), -- 名字
-    user_gender char(1) check(user_gender = '男' or user_gender = '女'),
+    	user_gender char(1) check(user_gender = '男' or user_gender = '女'),
 	user_phone char(10),
 	user_address varchar(50),
 	user_email varchar(50),
-    user_authority int -- 用戶權限 0為客戶，1為管理員 
+    	user_authority int -- 用戶權限 0為客戶，1為管理員 
 );
 
 create table account(
 	account_id int primary key auto_increment,
 	account_name char(10) unique not null,
 	account_balance bigint unsigned default 0,
-    user_id int not null,
-    account_status int default 0, -- 帳戶審核是否通過，0尚未審核， 1審核通過(可使用)， -1審核拒絕通過
-    foreign key(user_id) references user(user_id) on update cascade on delete cascade
+    	user_id int not null,
+    	account_status int default 0, -- 帳戶審核是否通過，0尚未審核， 1審核通過(可使用)， -1審核拒絕通過
+    	foreign key(user_id) references user(user_id) on update cascade on delete cascade
 ); 
 
 -- 交易種類(轉帳、存款、提款)
 create table type( 
 	type_id int primary key,
-    type_name varchar(10)
+    	type_name varchar(10)
 );
 
 insert into type values(1, '轉帳');
@@ -39,11 +39,11 @@ create table transactions(
 	tran_datetime datetime,
 	tran_description varchar(100),
 	tran_balance bigint unsigned, -- account 餘額 
-    tran_reciprocal_balance bigint unsigned, -- 對方account 餘額
+    	tran_reciprocal_balance bigint unsigned, -- 對方account 餘額
 	type_id int,
-    foreign key(account_id) references account(account_id) on update cascade on delete cascade,
-    foreign key(tran_reciprocal_id) references account(account_id) on update cascade on delete cascade,
-    foreign key(type_id) references type(type_id) on update cascade on delete cascade
+    	foreign key(account_id) references account(account_id) on update cascade on delete cascade,
+    	foreign key(tran_reciprocal_id) references account(account_id) on update cascade on delete cascade,
+    	foreign key(type_id) references type(type_id) on update cascade on delete cascade
 );
 
 -- 管理員測試資料
