@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+
+    <style> 
+        .el-input{
+            width: 90%
+        }
+        
+        
+    </style>
+</head>
+<body>
+    <div id="app">
+        <el-container>
+            <el-header>
+                <span id="title"><h1>個人資料</h1></span>
+            </el-header>
+            
+            <el-main> 
+                <el-row>
+                    <el-button type="primary" @click="dialogVisible = true" icon="el-icon-edit" circle></el-button>
+                    <el-button type="info" @click="goMain">回首頁</el-button>
+                </el-row>
+                <br>
+                <el-dialog title="更新資料(密碼不更新則不須輸入)" :visible.sync="dialogVisible" width="30%">
+                    
+                    <el-form ref="form" :model="form" :rules="rules">
+                        <el-form-item label="姓名" label-width="100px" prop="userName">
+                            <el-input v-model="form.userName" placeholder="請輸入姓名"></el-input>
+                        </el-form-item>
+                        <el-form-item label="密碼" label-width="100px" prop="userPassword">
+                            <el-input v-model="form.userPassword" placeholder="請輸入密碼" show-password></el-input>
+                        </el-form-item>
+                        <el-form-item label="性別" label-width="100px" prop="userGender">
+                            <el-radio v-model="form.userGender" label="男">男</el-radio>
+                            <el-radio v-model="form.userGender" label="女">女</el-radio>
+                        </el-form-item>
+                        <el-form-item label="電話" label-width="100px" prop="userPhone">
+                            <el-input v-model="form.userPhone" placeholder="請輸入電話"></el-input>
+                        </el-form-item>
+                        <el-form-item label="地址" label-width="100px" prop="userAddress">
+                            <el-input v-model="form.userAddress" placeholder="請輸入地址"></el-input>
+                        </el-form-item>
+                        <el-form-item label="email" label-width="100px" prop="userEmail">
+                            <el-input v-model="form.userEmail" placeholder="請輸入email"></el-input>
+                        </el-form-item>
+                            
+                    </el-form>
+
+                    <span slot="footer" class="dialog-footer">
+                        <el-button @click="dialogVisible = false">取消</el-button>
+                        <el-button type="primary" @click="updateInfo">更新</el-button>
+                    </span>
+                </el-dialog>  
+                <el-descriptions class="margin-top" title="" :column="3" border>
+                    
+
+                    <el-descriptions-item>
+                      <template slot="label">
+                        <i class="el-icon-user"></i>
+                        使用者帳號
+                      </template>
+                      {{info.userLoginName}}
+                    </el-descriptions-item>
+
+                    <el-descriptions-item>
+                        <template slot="label">
+                          <i class="el-icon-s-custom"></i>
+                          姓名
+                        </template>
+                        {{info.userName}}
+                      </el-descriptions-item>
+
+                    <el-descriptions-item>
+                        <template slot="label">
+                        <i class="el-icon-star-on"></i>
+                        性別
+                        </template>
+                        {{info.userGender}}
+                    </el-descriptions-item>
+
+                    <el-descriptions-item>
+                      <template slot="label">
+                        <i class="el-icon-mobile-phone"></i>
+                        電話
+                      </template>
+                      {{info.userPhone}}
+                    </el-descriptions-item>
+
+
+                    <el-descriptions-item>
+                        <template slot="label">
+                          <i class="el-icon-office-building"></i>
+                          地址
+                        </template>
+                        {{info.userAddress}}
+                      </el-descriptions-item>
+
+                    <el-descriptions-item>
+                      <template slot="label">
+                        <i class="el-icon-message"></i>
+                        email
+                      </template>
+                      {{info.userEmail}}
+                    </el-descriptions-item>
+
+                  </el-descriptions>
+                
+            </el-main>
+        </el-container>
+        
+            
+    </div>
+    
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+<script src="../js/checkLogin.js"></script>
+<script>
+    new Vue({
+        el:"#app",
+        methods: {
+            updateInfo(){
+                let _this = this;
+                let url = '/users';
+                let data = this.form;
+                axios.put(url, data).then(
+                    function(resp){
+                        checkLogin(resp.request.responseURL);
+
+                        if(resp.data.code == 1){
+                            _this.getInfo();
+                            Vue.prototype.$message({
+                                message: '更新成功 ',
+                                center: true,
+                                type: 'success',
+                                showClose: true
+                            });
+                        }else{
+                            Vue.prototype.$message({
+                                message: '更新失敗，請再試一次',
+                                center: true,
+                                type: 'error',
+                                showClose: true
+                            });
+                        }
+                        _this.dialogVisible = false;
+                    }
+                )
+            },
+
+            getInfo(){
+                let _this = this;
+                let url="/users";
+                axios.get(url).then(
+                    function(resp){
+                        checkLogin(resp.request.responseURL);
+
+                        _this.info.userLoginName = resp.data.data.userLoginName;
+                        _this.info.userName = resp.data.data.userName;
+                        _this.info.userGender = resp.data.data.userGender;
+                        _this.info.userPhone = resp.data.data.userPhone;
+                        _this.info.userAddress = resp.data.data.userAddress;
+                        _this.info.userEmail = resp.data.data.userEmail;
+
+                        _this.form.userName = resp.data.data.userName;
+                        _this.form.userGender = resp.data.data.userGender;
+                        _this.form.userPhone = resp.data.data.userPhone;
+                        _this.form.userAddress = resp.data.data.userAddress;
+                        _this.form.userEmail = resp.data.data.userEmail;
+                    }
+                )   
+            },
+
+            goMain(){
+                location.href="main.html";
+            }
+
+            
+
+        },
+        data() {
+            return {
+                info:{
+                    userLoginName:'a',
+                    userName:'a',
+                    userGender:'a',
+                    userPhone:'a',
+                    userAddress:'a',
+                    userEmail:'a',  
+                },
+                
+                dialogVisible: false,
+
+                form: {
+                    userPassword:'',
+                    userName:'',
+                    userGender:'',
+                    userPhone:'',
+                    userAddress:'',
+                    userEmail:''
+                },
+
+                rules: {
+                    
+                    userPassword: [
+                        { pattern: /^\w{6,10}$/, message:'長度為6-10位的大小寫英文與數字', trigger: 'blur' }
+                    ],
+                    userName: [
+                        { required: true, message: '不可為空', trigger: 'blur' },
+                        { min: 2, max: 10, message:'長度2-10位中英字母', trigger: 'blur' }
+                    ],
+                    userGender:[
+                        { required: true, message: '不可為空', trigger: 'change' },
+                    ],
+                    userPhone: [
+                        { required: true, message: '不可為空', trigger: 'blur' },
+                        { pattern: /^09\d{8}$/, message:'長度為10位數的手機號碼', trigger: 'blur' }
+                    ],
+                    userAddress: [
+                        { required: true, message: '不可為空', trigger: 'blur' },
+                        { max: 50, message:'長度不可超過50個字', trigger: 'blur' }
+                    ],
+                    userEmail: [
+                        { required: true, message: '不可為空', trigger: 'blur' },
+                        { pattern: /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/
+                            , message:'email格式錯誤', trigger: 'blur' }
+                    ]
+                }
+            }
+        },
+
+        mounted: function(){
+            this.getInfo();
+        }
+    })
+</script>
+</html>

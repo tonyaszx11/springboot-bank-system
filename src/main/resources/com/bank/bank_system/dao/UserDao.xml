@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bank.bank_system.dao.UserDao">
+    <resultMap id="userMap" type="com.bank.bank_system.pojo.User">
+        <id column="user_id" property="userId"/>
+        <result column="user_login_name" property="userLoginName"/>
+        <result column="user_password" property="userPassword"/>
+        <result column="user_name" property="userName"/>
+        <result column="user_gender" property="userGender"/>
+        <result column="user_phone" property="userPhone"/>
+        <result column="user_address" property="userAddress"/>
+        <result column="user_email" property="userEmail"></result>
+        <result column="user_authority" property="userAuthority"/>
+    </resultMap>
+
+    <!--mybatis可以在dao interface用註解來寫SQL語句，如果太複雜則會在xml來寫SQL語句-->
+
+    <!--更新用戶資料的SQL語句-->
+    <!--更新用戶資料時如果不想更改某些欄位，則實體類屬性就保持空值或null
+        用if判斷傳進來的實體類的屬性如果不是空值或null，就更新該欄位-->
+    <update id="update">
+        update user
+        <set>
+            <if test="userPassword != null and userPassword != ''">
+                user_password = #{userPassword},
+            </if>
+            <if test="userName != null and userName != ''">
+                user_name = #{userName},
+            </if>
+            <if test="userGender != null and userGender != ''">
+                user_gender = #{userGender},
+            </if>
+            <if test="userPhone != null and userPhone != ''">
+                user_phone = #{userPhone},
+            </if>
+            <if test="userAddress != null and userAddress != ''">
+                user_address = #{userAddress},
+            </if>
+            <if test="userEmail != null and userEmail != ''">
+                user_email = #{userEmail}
+            </if>
+        </set>
+        where user_id = #{userId}
+    </update>
+
+</mapper>

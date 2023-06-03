@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+	<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+
+	<style>
+		.el-input {
+			width: 20%
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app">
+		<el-container>
+			<el-header>
+				<span>
+					<h1>審核帳戶</h1>
+				</span>
+			</el-header>
+
+			<el-main>
+
+				<el-row>
+					<el-button type="info" @click="goMain">回首頁</el-button>
+				</el-row>
+
+				<br><br><br><br><br>
+				<el-table :data="accounts" style="width: 100%" stripe>
+					<el-table-column prop="userName" label="姓名" align="center"></el-table-column>
+					<el-table-column prop="userLoginName" label="使用者帳戶名" align="center"></el-table-column>
+					<el-table-column prop="accountName" label="未審核之銀行帳號" align="center"></el-table-column>
+					<el-table-column label="操作" align="center">
+						<template v-slot="scope">
+							<el-button type="success" @click="approve(scope.row)">審核通過</el-button>
+							<el-button type="danger" @click="reject(scope.row)">拒絕</el-button>
+						</template>
+						</el-row>
+					</el-table-column>
+
+				</el-table>
+
+			</el-main>
+		</el-container>
+
+
+	</div>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+<script src="../js/checkLogin.js"></script>
+<script>
+	new Vue({
+		el: '#app',
+		data() {
+			return {
+				accounts: [],
+
+				form: {
+					accountId: '',
+					accountName: ''
+				},
+
+				info: {
+					accountId: '',
+					accountName: '',
+					accountBalance: '',
+					userId: ''
+				}
+
+
+			}
+		},
+
+		methods: {
+			getUnreviewed() {
+				let _this = this;
+				let url = "/accounts/review";
+				axios.get(url).then(
+					function (resp) {
+						checkLogin(resp.request.responseURL);
+
+						if (resp.data.data.length > 0) {
+							_this.accounts = resp.data.data;
+						} else {
+							alert("沒有尚未審核的帳號");
+						}
+					}
+				)
+			},
+
+			approve(row) {
+				let _this = this;
+				let url = "/accounts/review/" + row.accountId;
+				axios.patch(url).then(
+					function (resp) {
+						if (resp.data.code == 1) {
+							Vue.prototype.$message({
+								message: '審核通過操作成功',
+								center: true,
+								type: 'success',
+								showClose: true
+							});
+							location.reload();
+						} else {
+							Vue.prototype.$message({
+								message: '審核通過操作失敗',
+								center: true,
+								type: 'error',
+								showClose: true
+							});
+						}
+					}
+				)
+			},
+			reject(row) {
+				let _this = this;
+				let url = "/accounts/review/" + row.accountId;
+				axios.delete(url).then(
+					function (resp) {
+						if (resp.data.code == 1) {
+							Vue.prototype.$message({
+								message: '審核拒絕操作成功',
+								center: true,
+								type: 'success',
+								showClose: true
+							});
+							location.reload();
+						} else {
+							Vue.prototype.$message({
+								message: '審核拒絕操作失敗',
+								center: true,
+								type: 'error',
+								showClose: true
+							});
+						}
+					}
+				)
+			},
+
+			goMain() {
+				location.href = "adminMain.html";
+			}
+		},
+
+		mounted: function () {
+			this.getUnreviewed();
+		}
+	})
+</script>
+
+</html>

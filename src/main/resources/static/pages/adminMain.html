@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+
+    <style> 
+        #title{
+            text-align: center ;
+        }
+        
+        .block {
+            height: 200px; /*高度*/
+            width: 600px;  /*寬度*/
+            position: absolute;     /*絕對位置*/
+            top: 50%;               /*從上面開始算，下推 50% (一半) 的位置*/
+            left: 50%; 
+            margin-top: -120px;     /*高度的一半*/
+            margin-left: -120px;    /*寬度的一半*/
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+    <el-container>
+        <el-header>
+            <span id="title"><h1>後台管理</h1></span>
+        </el-header>
+        
+        <el-main>
+            <div class="block">
+                <div>
+                    <span><h2>您好，{{name}}</h2>
+                    <el-row>
+                        <el-button type="success" icon="el-icon-bank-card" @click="accountReview">審核帳戶</el-button>
+                        <el-button type="danger" icon="el-icon-s-custom" @click="logout">登出</el-button></span><br>
+                    </el-row>
+                </div>
+              </div>
+            
+        </el-main>
+    </el-container>
+    
+        
+    </div>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+<script src="../js/checkLogin.js"></script>
+<script>
+    new Vue({
+        el:"#app",
+        methods: {
+            accountReview(){
+                location.href="accountReview.html";
+            },
+            logout(){
+                let url="/users/logout";
+                axios.post(url).then(
+                    function(resp){
+                        location.href="userLogin.html";
+                    }
+                );
+            }
+        },
+        data() {
+            return {
+                name:''
+            }
+        },
+
+        mounted: function(){
+            let _this = this;
+            let url="/users";
+            
+            axios.get(url).then(
+                function(resp){
+                    checkLogin(resp.request.responseURL);                
+                    _this.name = resp.data.data.userName;
+                }
+            );
+        }
+    })
+</script>
+</html>

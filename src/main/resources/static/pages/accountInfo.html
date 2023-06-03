@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+
+    <style> 
+        .el-input{
+            width: 20%
+        }
+        
+        
+    </style>
+</head>
+<body>
+    <div id="app">
+    <el-container>
+        <el-header>
+            <span><h1>查看帳戶資訊與交易紀錄</h1></span>
+        </el-header>
+        
+        <el-main>
+          <el-form :inline="true" ref="form" :model="form" >
+            請選擇帳戶:
+            <el-select v-model="form.accountId" placeholder="請選擇帳戶" @change="selectAccount">
+              <el-option
+                v-for="item in accounts"
+                :key="item.accountId"
+                :label="item.accountName"
+                :value="item.accountId">
+              </el-option>
+            </el-select>
+            <el-form-item>
+              <el-button type="info" @click="goMain">回首頁</el-button>
+            </el-form-item>
+            
+          </el-form>
+          
+          
+          <br><br>
+
+          
+          <el-descriptions class="margin-top" title="" :column="3" border>
+            <el-descriptions-item>
+              <template slot="label">
+                <i class="el-icon-user"></i>
+                銀行帳號
+              </template>
+              {{info.accountName}}
+            </el-descriptions-item>
+
+            <el-descriptions-item>
+                <template slot="label">
+                  <i class="el-icon-coin"></i>
+                  餘額
+                </template>
+                {{info.accountBalance}}
+              </el-descriptions-item>
+            </el-descriptions-item>
+
+          </el-descriptions>
+          <br><br><br><br><br>
+          <el-table :data="transactions" style="width: 100%" stripe>
+            <el-table-column prop="accountName" label="銀行帳號"  align="center"></el-table-column>
+            <el-table-column prop="reciprocalAccountName" label="對方銀行帳號"  align="center"></el-table-column>
+            <el-table-column prop="typeId" label="交易類型"  align="center"></el-table-column>
+            <el-table-column prop="tranAmount" label="交易金額" align="center"></el-table-column>
+            <el-table-column prop="tranDatetime" label="日期" align="center"></el-table-column>
+            <el-table-column prop="tranBalance" label="餘額" align="center"></el-table-column>
+            <el-table-column prop="tranDescription" label="說明" align="center"></el-table-column>
+        </el-table>
+
+        </el-main>
+    </el-container>
+    
+        
+    </div>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+<script src="../js/checkLogin.js"></script>
+<script>
+    new Vue({
+        el:'#app',
+        data(){
+          return{
+            accounts:[],
+          
+            form:{
+              accountId:'',
+              accountName:''
+            },
+
+            info:{
+              accountId:'',
+              accountName:'',
+              accountBalance:'',
+              userId:''
+            },
+
+            transactions:[]
+          }
+        },
+
+        methods: {
+          async selectAccount(){
+            // console.log(this.form.accountId);
+            let _this = this;
+            let url = '/accounts/' + _this.form.accountId;
+            let url2 = '/accounts/transactions/' + _this.form.accountId;
+
+            //查帳戶資訊
+            await axios.get(url).then(
+              function(resp){
+                checkLogin(resp.request.responseURL);
+                _this.info = resp.data.data;                
+              }
+            );
+
+            //查交易紀錄
+            axios.get(url2).then(
+              function(resp){
+                let data = resp.data.data;
+                for(let i = 0; i<data.length; i++){
+                  if(data[i].typeId == 1){
+                    //轉出的紀錄
+                    if(_this.info.accountName == data[i].accountName){
+                      data[i].typeId = '轉出';
+                    }
+                    //轉入的紀錄
+                    else if(_this.info.accountName == data[i].reciprocalAccountName){
+                      data[i].typeId = '轉入';
+
+                      //轉入的原始紀錄為accountName為轉出帳戶(其他帳戶)，reciprocalAccountName為轉入帳戶(自己帳戶)
+                      //因此類型改為轉入，然後把accountName改成自己帳戶(轉入帳戶)，reciprocalAccountName改為轉出帳戶(其他帳戶)
+                      let temp = data[i].accountName;
+                      data[i].accountName = data[i].reciprocalAccountName;
+                      data[i].reciprocalAccountName = temp;
+
+                      //reciprocalBalance也就是自己帳戶的餘額把它放到accountBalance
+                      data[i].tranBalance = data[i].tranReciprocalBalance;
+                    }
+                  }else if(data[i].typeId == 2){
+                    data[i].typeId = '存款';
+                  }else{
+                    data[i].typeId = '提款';
+                  }
+                  
+                  if(data[i].reciprocalAccountName == null || data[i].reciprocalAccountName == '' || data[i].reciprocalAccountName == undefined){
+                    data[i].reciprocalAccountName = '-';
+                  }
+                  
+                }
+                _this.transactions = data;
+                
+              }
+            )
+
+          },
+          goMain(){
+            location.href="main.html";
+          }
+        },
+
+        mounted:function(){
+          let _this = this;
+          let url = '/accounts';
+          axios.get(url).then(
+            function(resp){
+              checkLogin(resp.request.responseURL);
+
+              if(resp.data.data.length > 0){
+                let accounts = resp.data.data;
+                for(let i = 0; i < accounts.length;i++){
+                  _this.$set(_this.accounts, i, accounts[i]);
+                } 
+              }else{
+                  alert("您尚未擁有銀行帳戶，或是您申請的銀行帳戶正在審核中，請稍後再試");
+                  location.href="main.html";
+              }
+
+              
+            }
+          )
+        }
+    })
+</script>
+</html>

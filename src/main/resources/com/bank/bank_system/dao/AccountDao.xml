@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bank.bank_system.dao.AccountDao">
+    <!--設定資料庫的欄位名與實體類名的映射(因為資料庫通常用_分隔命名，而java使用駝峰命名)-->
+    <resultMap id="accountMap" type="com.bank.bank_system.pojo.Account">
+        <id column="account_id" property="accountId"/>
+        <result column="account_name" property="accountName"/>
+        <result column="account_balance" property="accountBalance"/>
+        <result column="user_id" property="userId"/>
+        <result column="account_status" property="accountStatus"/>
+
+        <!--join user表所需的欄位-->
+        <result column="user_login_name" property="userLoginName"/>
+        <result column="user_name" property="userName"/>
+    </resultMap>
+</mapper>

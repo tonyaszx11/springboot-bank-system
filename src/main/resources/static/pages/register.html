@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+
+    <style> 
+        .el-input{
+            width: 20%
+        }
+        
+        
+    </style>
+</head>
+<body>
+    <div id="app">
+    <el-container>
+        <el-header>
+            <span><h1>用戶註冊</h1></span>
+        </el-header>
+        
+        <el-main>
+            <el-form ref="form" :model="form" :rules="rules">
+                <el-form-item label="登入帳號" label-width="100px" prop="userLoginName">
+                  <el-input v-model="form.userLoginName" placeholder="請輸入帳號" clearable></el-input>
+                </el-form-item>
+                <el-form-item label="密碼" label-width="100px" prop="userPassword">
+                    <el-input v-model="form.userPassword" placeholder="請輸入密碼" show-password></el-input>
+                </el-form-item>
+                <el-form-item label="姓名" label-width="100px" prop="userName">
+                    <el-input v-model="form.userName" placeholder="請輸入姓名" clearable></el-input>
+                </el-form-item>
+                <el-form-item label="性別" label-width="100px">
+                    <el-radio v-model="form.userGender" label="男">男</el-radio>
+                    <el-radio v-model="form.userGender" label="女">女</el-radio>
+                </el-form-item>
+                <el-form-item label="電話" label-width="100px" prop="userPhone">
+                    <el-input v-model="form.userPhone" placeholder="請輸入電話" clearable></el-input>
+                </el-form-item>
+                <el-form-item label="地址" label-width="100px" prop="userAddress">
+                    <el-input v-model="form.userAddress" placeholder="請輸入地址" clearable></el-input>
+                </el-form-item>
+                <el-form-item label="email" label-width="100px" prop="userEmail">
+                    <el-input v-model="form.userEmail" placeholder="請輸入email" clearable></el-input>
+                </el-form-item>
+                    
+                <el-form-item>
+                  <el-button type="primary" @click="onSubmit">註冊</el-button>
+                  <el-button @click="goToLoginPage">回登入頁面</el-button>
+                </el-form-item>
+            </el-form>
+        </el-main>
+    </el-container>
+    
+        
+    </div>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+<script src="../js/checkLogin.js"></script>
+<script>
+    new Vue({
+        el:"#app",
+        methods: {
+            goToLoginPage(){
+                location.href ="userLogin.html";
+            },
+
+            onSubmit(){
+                let url = '/users/register';
+                let data = this.form;
+                axios.post(url, data).then(
+                    function(resp){
+                        if(resp.data.code == 1){
+                            alert("註冊成功");
+                            location.href ="userLogin.html";
+                        }else{
+                            Vue.prototype.$message({
+                                message: '註冊失敗，請再試一次',
+                                center: true,
+                                type: 'error',
+                                showClose: true
+                            });
+                        }
+                    }
+                )
+            }
+        },
+        data() {
+            return {
+                form: {
+                    userLoginName: '',
+                    userPassword: '',
+                    userName:'',
+                    userGender:'',
+                    userPhone:'',
+                    userAddress:'',
+                    userEmail:''
+                },
+
+                rules: {
+                    userLoginName: [
+                        { required: true, message: '不可為空', trigger: 'blur' },
+                        { pattern: /^[a-zA-Z]\w{5,9}$/, message:'長度為6-10位的大小寫英文與數字,且必須為英文開頭', trigger: 'blur' }
+                    ],
+                    userPassword: [
+                        { required: true, message: '不可為空', trigger: 'blur' },
+                        { pattern: /^\w{6,10}$/, message:'長度為6-10位的大小寫英文與數字', trigger: 'blur' }
+                    ],
+                    userName: [
+                        { required: true, message: '不可為空', trigger: 'blur' },
+                        { min: 2, max: 10, message:'長度2-10位中英字母', trigger: 'blur' }
+                    ],
+                    userPhone: [
+                        { required: true, message: '不可為空', trigger: 'blur' },
+                        { pattern: /^09\d{8}$/, message:'長度為10位數的手機號碼', trigger: 'blur' }
+                    ],
+                    userAddress: [
+                        { required: true, message: '不可為空', trigger: 'blur' },
+                        { max: 50, message:'長度不可超過50個字', trigger: 'blur' }
+                    ],
+                    userEmail: [
+                        { required: true, message: '不可為空', trigger: 'blur' },
+                        { pattern: /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/
+                            , message:'email格式錯誤', trigger: 'blur' }
+                    ]
+                }
+
+            }
+        }
+    })
+</script>
+</html>

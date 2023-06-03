@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+
+    <style> 
+        .el-input{
+            width: 20%
+        }
+        
+        
+    </style>
+    
+</head>
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+<script src="../js/checkLogin.js"></script>
+<body>
+<div id="app">
+    <el-container>
+        <el-header>
+            <span><h1>用戶登入</h1></span>
+        </el-header>
+        
+        <el-main>
+            <el-form ref="form" :model="form" >
+                <el-form-item label="登入帳號" label-width="100px">
+                  <el-input v-model="form.userLoginName" clearable></el-input>
+                </el-form-item>
+                <el-form-item label="密碼" label-width="100px">
+                    <el-input v-model="form.userPassword" show-password></el-input>
+                </el-form-item>
+                    
+                <el-form-item>
+                  <el-button type="primary" @click="onSubmit">登入</el-button>
+                  <el-button @click="goToRegisterPage">註冊</el-button>
+                </el-form-item>
+            </el-form>
+        </el-main>
+    </el-container>
+</div>
+    
+</body>
+
+<script>
+    new Vue({
+        el:"#app",
+        methods: {
+            onSubmit() {
+                let url = "/users/login";
+                let data = this.form;
+                
+                axios.post(url, data).then(
+                    function(resp){
+                        if(resp.data.code == 1 && resp.data.data == 0){
+                            location.href="main.html";
+                        }else if(resp.data.code == 1  && resp.data.data == 1){
+                            location.href="adminMain.html";
+                        }else{
+                            Vue.prototype.$message({
+                                message: '帳號或密碼錯誤',
+                                center: true,
+                                type: 'error',
+                                showClose: true
+                            });
+                        }
+                });
+                
+            },
+
+            goToRegisterPage(){
+                location.href="register.html";
+            }
+
+            
+        },
+        data() {
+            return {
+                form: {
+                    userLoginName: '',
+                    userPassword: ''
+                }
+            }
+        }
+    })
+</script>
+</html>

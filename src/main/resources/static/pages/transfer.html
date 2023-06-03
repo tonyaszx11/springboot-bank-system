@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+
+    <style> 
+        .el-input{
+            width: 20%
+        }
+        
+        
+    </style>
+</head>
+<body>
+    <div id="app">
+    <el-container>
+        <el-header>
+            <span><h1>轉帳</h1></span>
+        </el-header>
+        
+        <el-main>
+          <el-form :inline="true" ref="form" :model="form" >
+            請選擇帳戶: 
+            <el-select v-model="form.accountId" placeholder="請選擇帳戶" @change="selectAccount">
+              <el-option
+                v-for="item in accounts"
+                :key="item.accountId"
+                :label="item.accountName"
+                :value="item.accountId">
+              </el-option>
+            </el-select>
+            <el-form-item>
+              <!-- <el-button type="success" @click="selectAccount">確定</el-button> -->
+              <el-button type="info" @click="goMain">回首頁</el-button>
+            </el-form-item>
+            
+          </el-form>
+          
+          
+          <br><br>
+
+          
+          <el-descriptions class="margin-top" title="" :column="3" border>
+            <el-descriptions-item>
+              <template slot="label">
+                <i class="el-icon-user"></i>
+                銀行帳號
+              </template>
+              {{info.accountName}}
+            </el-descriptions-item>
+
+            <el-descriptions-item>
+                <template slot="label">
+                  <i class="el-icon-coin"></i>
+                  餘額
+                </template>
+                {{info.accountBalance}}
+              </el-descriptions-item>
+            </el-descriptions-item>
+
+          </el-descriptions>
+          <br><br><br><br><br>
+          <el-form ref="form" :model="form" label-width="110px" :rules="rules">
+            <el-form-item label="銀行帳號">
+              <el-input v-model="info.accountName" readonly="readonly"></el-input>
+            </el-form-item>
+            <el-form-item label="對方銀行帳號" prop="reciprocalName" >
+                <el-input v-model="form.reciprocalName" clearable></el-input>
+            </el-form-item>
+            <el-form-item label="金額" prop="money" >
+                <el-input v-model="form.money" clearable></el-input>
+            </el-form-item>
+            <el-form-item label="說明" prop="desciption" >
+                <el-input v-model="form.description" clearable></el-input>
+            </el-form-item>
+            
+            <el-form-item>
+              <el-button type="primary" @click="transfer">確認轉帳</el-button>
+            </el-form-item>
+          </el-form>
+
+        </el-main>
+    </el-container>
+    
+        
+    </div>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+<script src="../js/checkLogin.js"></script>
+<script>
+     new Vue({
+        el:'#app',
+        data(){
+          return{
+            accounts:[],
+          
+            form:{
+              accountId:'',
+              reciprocalName:'',
+              money:'',
+              description:''
+            },
+
+            info:{
+              accountId:'',
+              accountName:'',
+              accountBalance:'',
+              userId:''
+            },
+
+            rules: {
+                reciprocalName: [
+                    { required: true, message: '不可為空', trigger: 'blur' },
+                    { pattern: /^\d{10}$/, message:'帳戶格式由長度為10位的數字組成', trigger: 'blur' }
+                ],
+
+                money:[
+                    { required: true, message: '不可為空', trigger: 'blur' },
+                    { pattern: /^[1-9]\d+$/, message:'必須為大於0的整數', trigger: 'blur' }
+                ]
+                    
+            }
+            
+            
+          }
+        },
+
+        methods: {
+            selectAccount(){
+                // console.log(this.form.accountId);
+                let _this = this;
+                let url = '/accounts/' + _this.form.accountId;
+                let url2 = '/accounts/transactions/' + _this.form.accountId;
+
+                //查帳戶資訊
+                axios.get(url).then(
+                    function(resp){
+                        checkLogin(resp.request.responseURL);
+                        _this.info = resp.data.data;
+                        _this.form.accountId = _this.info.accountId;      
+                    }
+                );
+            },
+
+            goMain(){
+                location.href="main.html";
+            },
+
+            transfer(){
+                let _this = this;
+
+                let url = "/accounts/transfer";
+                let params = this.form;
+                
+                axios({
+                    url: url,
+                    method: 'post',
+                    params: params
+                }).then(
+                    function(resp){
+                        if(resp.data.code == 1){
+                            alert("轉帳成功")
+                            location.href="main.html";
+                        }else{
+                            Vue.prototype.$message({
+                                message: '轉帳失敗，餘額不足或是對方帳號名不存在',
+                                center: true,
+                                type: 'error',
+                                showClose: true
+                            });
+                        }
+                    }
+                )
+            }
+        },
+
+        mounted:function(){
+          let _this = this;
+          let url = '/accounts';
+          axios.get(url).then(
+            function(resp){
+              checkLogin(resp.request.responseURL);
+
+              if(resp.data.data.length > 0){
+                let accounts = resp.data.data;
+                for(let i = 0; i < accounts.length;i++){
+                  _this.$set(_this.accounts, i, accounts[i]);
+                } 
+              }else{
+                  alert("您尚未擁有銀行帳戶，或是您申請的銀行帳戶正在審核中，請稍後再試");
+                  location.href="main.html";
+              }
+
+              
+            }
+          )
+        }
+    })
+</script>
+</html>
