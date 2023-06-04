@@ -10,6 +10,7 @@
 	</parent>
 	<groupId>com.bank</groupId>
 	<artifactId>bank_system</artifactId>
+	<version>1</version>
 
 
 	<properties>
