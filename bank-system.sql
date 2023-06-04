@@ -58,5 +58,5 @@ insert into user values(null, 'ming666', '9a2e2d42c89705533f0687c3b27b336a5fc81f
 insert into user values(null, 'hua666', 'c6946ec45a2b3dca7c479cdf2a4d37596f1e7c8a64f429603c46e505a720c1e2', 
 	'林小華', '女', '0912333666', '台北市', 'hua666@gmail.com',0); -- 密碼為hua666(SHA256)
     
-insert into account values(null, '8851236214', 10000, 2); -- 王小明的account
-insert into account values(null, '8863589974', 10000, 3); -- 林小華的account
+insert into account values(null, '8851236214', 10000, 2, 0); -- 王小明的account
+insert into account values(null, '8863589974', 10000, 3, 0); -- 林小華的account
