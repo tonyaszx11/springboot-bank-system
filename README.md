@@ -117,7 +117,7 @@ spring:
 ```
 5. 在target目錄打開cmd，執行以下代碼，伺服器就啟動完成了
 ```
-java -jar bank_system-2.7.11.jar
+java -jar bank_system-1.jar
 ```
   
 
