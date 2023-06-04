@@ -102,7 +102,7 @@
 ```
 mvnw clean package
 ```
-5. 到target目錄下打開application.yml設置資料庫的登入資訊(url, username, password)與server port(預設為8080)，如下範例  
+5. 到target目錄下建立一個application.yml檔案，並輸入以下代碼來設置資料庫的登入資訊(url, username, password)與server port(預設為8080)，如下範例  
 注意yml格式，:號後面需加一個空格再填入資訊
 ```
 server:
