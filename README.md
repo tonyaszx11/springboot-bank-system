@@ -98,7 +98,7 @@
 1. 電腦需安裝Java與Mysql
 2. clone此專案
 3. 打開mysql執行bank-system.sql，來創建表與加入測試資料
-4. 到根目錄打開cmd，執行以下代碼
+4. 到專案根目錄打開cmd，執行以下代碼
 ```
 mvnw clean package
 ```
