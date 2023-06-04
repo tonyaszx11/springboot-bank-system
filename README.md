@@ -94,7 +94,7 @@
 
 ![image](https://github.com/tonyaszx11/springboot-bank-system/assets/135413819/bfa87d2d-0dda-462f-b3f2-e15799bd8ae5)
 
-## 執行與運行系統
+## 啟動系統
 1. 電腦需安裝Java與Mysql
 2. clone此專案
 3. 打開mysql執行bank-system.sql，來創建表與加入測試資料
