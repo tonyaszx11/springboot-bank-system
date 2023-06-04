@@ -96,8 +96,13 @@
 
 ## 執行與運行系統
 1. 電腦需安裝Java與Mysql
-2. clone或下載此專案
-3. 到target目錄下打開application.yml設置資料庫的登入資訊(url, username, password)與server port(預設為8080)，如下範例  
+2. clone此專案
+3. 打開mysql執行bank-system.sql，來創建表與加入測試資料
+4. 到根目錄打開cmd，執行以下代碼
+```
+mvnw clean package
+```
+5. 到target目錄下打開application.yml設置資料庫的登入資訊(url, username, password)與server port(預設為8080)，如下範例  
 注意yml格式，:號後面需加一個空格再填入資訊
 ```
 server:
@@ -110,10 +115,9 @@ spring:
     username: root
     password: 123456
 ```
-5. 在target目錄打開cmd，執行
+5. 在target目錄打開cmd，執行以下代碼，伺服器就啟動完成了
 ```
-java -jar
+java -jar bank_system-2.7.11.jar
 ```
-
   
 
